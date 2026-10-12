@@ -1,0 +1,35 @@
+{
+  "image_path": "C:\\Users\\moruohan\\Desktop\\rose.jpg",
+  "checkpoint_path": "D:\\Codex.data\\lingjing\\outputs\\train_20261012_104629_645720_resume\\best_model.pth",
+  "checkpoint_epoch": 9,
+  "device": "cuda",
+  "predicted_class": "roses",
+  "predictions": [
+    {
+      "class": "roses",
+      "name_zh": "玫瑰",
+      "score": 0.607219398021698
+    },
+    {
+      "class": "tulips",
+      "name_zh": "郁金香",
+      "score": 0.25486430525779724
+    },
+    {
+      "class": "daisy",
+      "name_zh": "雏菊",
+      "score": 0.10679227858781815
+    },
+    {
+      "class": "sunflowers",
+      "name_zh": "向日葵",
+      "score": 0.016528360545635223
+    },
+    {
+      "class": "dandelion",
+      "name_zh": "蒲公英",
+      "score": 0.014595681801438332
+    }
+  ],
+  "score_note": "分数是五个已知类别的 softmax 分数，不是实测准确率。"
+}

@@ -1,0 +1,56 @@
+{
+  "checkpoint_path": "D:\\Codex.data\\lingjing\\outputs\\train_20261012_104629_645720_resume\\best_model.pth",
+  "checkpoint_epoch": 9,
+  "best_val_accuracy": 0.7074954296160878,
+  "split_sha256": "ca2a2b5412be6fd5cc1827510dbd9ff926e8ab85192300065e1df2914e924797",
+  "test_count": 556,
+  "correct_count": 388,
+  "test_accuracy": 0.697841726618705,
+  "test_loss": 0.8275004651049058,
+  "class_names": [
+    "daisy",
+    "dandelion",
+    "roses",
+    "sunflowers",
+    "tulips"
+  ],
+  "confusion_matrix": [
+    [
+      79,
+      10,
+      3,
+      2,
+      2
+    ],
+    [
+      14,
+      105,
+      2,
+      12,
+      3
+    ],
+    [
+      14,
+      19,
+      52,
+      3,
+      9
+    ],
+    [
+      8,
+      8,
+      0,
+      87,
+      3
+    ],
+    [
+      17,
+      9,
+      23,
+      7,
+      65
+    ]
+  ],
+  "matrix_axes": "rows=true, columns=predicted",
+  "score_note": "softmax_score 是模型分数，不是实测准确率。"
+}

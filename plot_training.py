@@ -1,11 +1,22 @@
 from pathlib import Path
+import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 
 project_dir = Path(__file__).resolve().parent
 
-# 这是你刚才这次训练的结果目录
-run_dir = project_dir / "outputs" / "train_20261012_102328"
+# 可以传入本次训练目录；不传参数时查看最初三轮。
+parser = argparse.ArgumentParser(description="绘制指定训练目录中的曲线")
+parser.add_argument(
+    "run_dir", nargs="?", type=Path,
+    default=project_dir / "outputs" / "train_20261012_102328",
+)
+args = parser.parse_args()
+run_dir = args.run_dir
+if not run_dir.is_absolute():
+    run_dir = project_dir / run_dir
+if not (run_dir / "history.csv").is_file():
+    parser.error(f"找不到训练记录：{run_dir / 'history.csv'}")
 df = pd.read_csv(run_dir / "history.csv")
 
 # 一张图中放两个子图
