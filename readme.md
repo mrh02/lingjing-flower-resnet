@@ -146,3 +146,28 @@ tar.exe -xzf data/flower_photos.tgz -C data
 ![十轮训练曲线](outputs/train_20261012_104629_645720_resume/training_curves.png)
 
 ![测试集混淆矩阵](outputs/train_20261012_104629_645720_resume/evaluation/confusion_matrix.png)
+
+## 错分图片观察
+
+通过 `review_errors.py` 读取已有的测试预测清单，不重新运行模型。
+选择错误数量最多的三种“真实类别 → 预测类别”组合，
+每种按清单顺序展示前两张，共六张。这是说明性样例，不是随机抽样。
+
+```powershell
+.\.venv\Scripts\python.exe review_errors.py "outputs/train_20261012_104629_645720_resume/evaluation"
+```
+
+![错分样例](outputs/train_20261012_104629_645720_resume/evaluation/error_examples.png)
+
+对样例的观察：
+
+- 图片包含花朵特写、花园远景和花束，拍摄距离及背景差异较大。
+- 一张标为郁金香的图片主要呈现天空和风车，花卉区域很小，
+  提示部分样本需要进一步检查目标是否清晰、标签是否适合整图分类。
+  仅凭该图不能确定标签错误，也不能确定模型使用了哪些特征。
+- 该图片被预测为雏菊，softmax 分数为 82.1%，但预测与数据集标签不符。
+  因此，较高的模型分数不能作为预测正确的保证。
+
+以上观察用于说明局限，没有删除测试样本或改动测试标签；
+测试准确率仍按全部 556 张图片计算。背景、目标大小等因素对模型的具体影响
+需要另行设计验证实验，不能直接作为本次错误的已证实原因。
