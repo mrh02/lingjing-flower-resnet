@@ -6,10 +6,14 @@ from torchvision import transforms
 
 
 class FlowerDataset(Dataset):
-    def __init__(self, split, transform):
+    def __init__(self, split, transform, manifest_path=None):
         self.project_dir = Path(__file__).resolve().parent
 
-        manifest = self.project_dir / "outputs" / "split_manifest.csv"
+        manifest = Path(manifest_path) if manifest_path is not None else (
+            self.project_dir / "outputs" / "split_manifest.csv"
+        )
+        if not manifest.is_absolute():
+            manifest = self.project_dir / manifest
         df = pd.read_csv(manifest)
 
         self.rows = df[df["split"] == split].reset_index(drop=True)

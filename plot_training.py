@@ -20,7 +20,8 @@ if not (run_dir / "history.csv").is_file():
 df = pd.read_csv(run_dir / "history.csv")
 
 # 一张图中放两个子图
-fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+panels = 3 if "val_macro_recall" in df.columns else 2
+fig, axes = plt.subplots(1, panels, figsize=(6 * panels, 4))
 
 # 左图：损失
 axes[0].plot(
@@ -46,6 +47,14 @@ axes[1].set_title("Accuracy")
 axes[1].set_xlabel("Epoch")
 axes[1].set_ylabel("Accuracy (%)")
 axes[1].set_ylim(0, 100)
+
+if panels == 3:
+    axes[2].plot(df["epoch"], df["val_macro_recall"] * 100,
+                 marker="o", label="Validation macro recall")
+    axes[2].set_title("Mean recall across classes")
+    axes[2].set_xlabel("Epoch")
+    axes[2].set_ylabel("Macro recall (%)")
+    axes[2].set_ylim(0, 100)
 
 for ax in axes:
     ax.set_xticks(df["epoch"])

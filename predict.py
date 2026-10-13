@@ -40,6 +40,7 @@ def predict_image(image_path, checkpoint_path, output_dir, device):
         checkpoint_path, map_location="cpu", weights_only=True,
     )
     class_names = checkpoint["class_names"]
+    chinese_names = checkpoint.get("class_names_zh", CHINESE_NAMES)
     image_size = int(checkpoint["image_size"])
     model = FlowerResNet(num_classes=len(class_names)).to(device)
     model.load_state_dict(checkpoint["model_state_dict"])
@@ -65,7 +66,7 @@ def predict_image(image_path, checkpoint_path, output_dir, device):
     predictions = [
         {
             "class": class_names[index],
-            "name_zh": CHINESE_NAMES.get(class_names[index], class_names[index]),
+            "name_zh": chinese_names.get(class_names[index], class_names[index]),
             "score": float(probabilities[index]),
         }
         for index in ranking
@@ -78,7 +79,7 @@ def predict_image(image_path, checkpoint_path, output_dir, device):
         "device": str(device),
         "predicted_class": predictions[0]["class"],
         "predictions": predictions,
-        "score_note": "分数是五个已知类别的 softmax 分数，不是实测准确率。",
+        "score_note": f"分数是 {len(class_names)} 个已知类别的 softmax 分数，不是实测准确率。",
     }
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -87,7 +88,7 @@ def predict_image(image_path, checkpoint_path, output_dir, device):
     json_path = output_dir / f"{basename}.json"
     chart_path = output_dir / f"{basename}.png"
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(12, max(5, len(class_names) * 0.28 + 1)))
     axes[0].imshow(image)
     axes[0].axis("off")
     axes[0].set_title(f"Prediction: {predictions[0]['class']}")
@@ -100,7 +101,7 @@ def predict_image(image_path, checkpoint_path, output_dir, device):
     axes[1].invert_yaxis()
     axes[1].set_xlim(0, 100)
     axes[1].set_xlabel("Softmax score (%)")
-    axes[1].set_title("Scores among the five known classes")
+    axes[1].set_title(f"Scores among {len(class_names)} supported classes")
     for index, item in enumerate(predictions):
         axes[1].text(
             98, index, f"{item['score']:.1%}",
@@ -153,7 +154,7 @@ def main():
     print("各类别的模型分数：")
     for item in result["predictions"]:
         print(f"  {item['name_zh']}：{item['score']:.1%}")
-    print("分数不代表实测准确率；模型仅支持以上五类花卉。")
+    print(f"分数不代表实测准确率；模型仅支持以上 {len(result['predictions'])} 类花卉。")
     print("预测展示图：", chart_path)
     print("预测结果记录：", json_path)
 

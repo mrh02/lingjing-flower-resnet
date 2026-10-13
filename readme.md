@@ -1,6 +1,20 @@
-# 基于手写ResNet的五类花卉图像分类系统
+# 基于手写 ResNet 的花卉图像分类系统：从五类到 25 类
 
-灵境竞赛组 AI 方向第一阶段考核项目。
+
+
+## 项目发展过程
+
+项目先完成五类花卉识别的完整流程，再在该基础上新增二十类，扩展到 25 类。
+两个阶段分别保存数据划分、模型和结果，记录真实的开发过程。
+
+| 阶段 | 类别范围 | 完成情况与结果 |
+| --- | --- | --- |
+| 第一阶段：五类基线 | 雏菊、蒲公英、玫瑰、向日葵、郁金香 | 已完成数据分析、手写 ResNet、训练、预测和评估；最佳验证准确率 70.7%，测试准确率 69.8% |
+| 第二阶段：25 类扩展 | 保留原五类，新增百合、荷花、兰花等二十类 | 已准备数据及训练入口；清洗后共 5963 张，尚无 25 类正式训练或测试成绩 |
+
+第一阶段先跑通从图片到分类结果的流程，并发现模型无法识别支持类别以外的花卉。
+第二阶段据此扩大类别范围，补充像素去重和类别不均衡处理。
+增加类别后，需要真实训练，不能通过修改类别名称直接获得识别能力。
 
 ## 项目目标
 使用 Python 完成花卉数据分析，并使用 PyTorch 手写 ResNet，
@@ -19,8 +33,10 @@
 ## 开发状态
 已完成数据统计与可视化、固定数据划分、手写 ResNet、十轮训练、
 单张图片预测和测试集评估。第 9 轮模型的验证准确率最高，为 70.7%；
-该模型的测试准确率为 69.8%（388/556）。后续完善项目说明、个人总结和演示材料。
-## 数据准备
+该模型的测试准确率为 69.8%（388/556），这是第一阶段五类基线的成绩。
+当前进入第二阶段：已在原五类基础上新增二十类，准备好 25 类数据和训练入口。
+第二阶段的实测成绩将在正式训练和评估完成后补充。
+## 第一阶段：五类数据准备
 
 数据来源：https://www.tensorflow.org/tutorials/load_data/images
 
@@ -44,7 +60,7 @@ tar.exe -xzf data/flower_photos.tgz -C data
 - class_counts.csv：各类别的数量与占比。
 - class_counts.png：类别数量柱状图。
 
-## 训练与接续训练
+## 第一阶段：五类训练与接续训练
 
 首次三轮训练：
 
@@ -70,7 +86,7 @@ tar.exe -xzf data/flower_photos.tgz -C data
 .\.venv\Scripts\python.exe plot_training.py "outputs/本次训练目录"
 ```
 
-## 单张图片实际预测
+## 第一阶段：五类模型的单张图片预测
 
 使用本次选定的第 9 轮模型预测一张 JPG/PNG 花卉照片：
 
@@ -86,7 +102,7 @@ tar.exe -xzf data/flower_photos.tgz -C data
 .\.venv\Scripts\python.exe predict.py "图片路径" --checkpoint "模型文件路径"
 ```
 
-模型支持雏菊、蒲公英、玫瑰、向日葵、郁金香五类。
+五类基线模型支持雏菊、蒲公英、玫瑰、向日葵、郁金香五类。
 预测处理方式与验证一致：RGB、128×128、像素缩放到 0～1。
 预测时使用评估模式，不更新参数，不需要提供图片的正确类别。
 
@@ -94,7 +110,7 @@ tar.exe -xzf data/flower_photos.tgz -C data
 `outputs/predictions/`。分数不是实测准确率，也不能用于确认照片属于
 这五类之外的某个类别。额外照片用于实际使用演示，不计入验证准确率。
 
-## 测试集评估与结果分析
+## 第一阶段：五类测试集评估与结果分析
 
 固定划分为训练集 2567 张、验证集 547 张、测试集 556 张。
 训练与模型选择使用训练集和验证集，模型选定后才评估测试集。
@@ -171,3 +187,125 @@ tar.exe -xzf data/flower_photos.tgz -C data
 以上观察用于说明局限，没有删除测试样本或改动测试标签；
 测试准确率仍按全部 556 张图片计算。背景、目标大小等因素对模型的具体影响
 需要另行设计验证实验，不能直接作为本次错误的已证实原因。
+
+## 第二阶段：从五类扩展到 25 类
+
+在原五类基础上新增二十类。新增图片来自
+[牛津大学 Oxford Flowers102](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)，
+TensorFlow 也在 [数据集目录](https://www.tensorflow.org/datasets/catalog/oxford_flowers102)
+介绍该数据集。原来的 `flower_photos.tgz` 固定只有五类，扩展需要另一个数据包。
+本项目继续用 PyTorch 训练，读取图片不需要安装 TensorFlow。
+
+新增类别及清洗后的图片数如下，原五类编号 0～4 保持不变：
+
+| 新增类别 | 类别编号 | 清洗后图片数 | 来源类别范围 |
+| --- | ---: | ---: | --- |
+| 百合（卷丹百合） | 5 | 45 | tiger lily |
+| 荷花 | 6 | 137 | lotus |
+| 兰花（选取三类） | 7 | 175 | moon orchid、hard-leaved pocket orchid、ruby-lipped cattleya |
+| 山茶花 | 8 | 91 | camellia |
+| 木槿属花卉 | 9 | 131 | hibiscus |
+| 康乃馨 | 10 | 51 | carnation |
+| 黄水仙 | 11 | 59 | daffodil |
+| 鸢尾（选取两类） | 12 | 103 | bearded iris、yellow iris |
+| 花菱草 | 13 | 102 | californian poppy |
+| 矮牵牛 | 14 | 258 | petunia |
+| 三角梅 | 15 | 128 | bougainvillea |
+| 木兰属花卉 | 16 | 63 | magnolia |
+| 万寿菊 | 17 | 67 | marigold |
+| 睡莲 | 18 | 194 | water lily |
+| 鹤望兰 | 19 | 85 | bird of paradise |
+| 鸡蛋花 | 20 | 166 | frangipani |
+| 红掌 | 21 | 105 | anthurium |
+| 杜鹃花 | 22 | 96 | azalea |
+| 仙客来 | 23 | 154 | cyclamen |
+| 金鱼草 | 24 | 87 | snapdragon |
+
+这里的百合、兰花等类别只覆盖表中明确选取的来源品种，
+不代表已训练或验证了这些花卉的全部品种。来源类别的编号通过官方类别页的
+示例图片与 `imagelabels.mat` 对照核实，映射保存在 `dataset_info.json`。
+
+### 数据清洗与划分
+
+组合前共 5968 个图片文件记录。按 RGB 像素和图片尺寸检查，
+排除三个同标签的重复文件记录，以及一组相同图片、不同标签的两个文件记录，
+最终保留 5963 张：训练集 4161 张、验证集 882 张、测试集 920 张。
+不改动原五类图片或旧清单。相同图片标签冲突时，排除两条记录，不自动重标。
+原五类其余图片保留原分组；新增类别使用固定种子划分为约 70%/15%/15%。
+本实验没有使用 Oxford 官方分组，不能与它的官方基准成绩直接比较。
+
+像素去重发现原五类有三组相同图片，其中两组跨数据分组，
+一组同时具有玫瑰与郁金香两个标签。这是扩展阶段新增审计发现的问题。
+因此，原 69.8% 保留为五类初版的实测成绩，不能视为已完成像素去重的基准。
+新版独立清洗并排除了像素完全相同的重复数据，但不保证识别所有近似重复图。
+原五类测试集成绩和错分图片也已被查看，所以 25 类合并测试集不是一份
+完全未接触过的盲测数据；最终报告需保留这一限制。
+
+独立结果在 `outputs/flower25/`，包含清单、类别统计图、数据来源映射及删除记录。
+
+![25 类图片数量](outputs/flower25/class_counts.png)
+
+### 下载并准备扩展数据
+
+在已准备原五类数据的基础上，运行：
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install scipy==1.15.3
+New-Item -ItemType Directory -Force data/flowers102
+curl.exe --fail --location --output data/flowers102/imagelabels.mat https://www.robots.ox.ac.uk/~vgg/data/flowers/102/imagelabels.mat
+curl.exe --fail --location --output data/flowers102/categories.html https://www.robots.ox.ac.uk/~vgg/data/flowers/102/categories.html
+curl.exe --fail --location --output data/flowers102/README.txt https://www.robots.ox.ac.uk/~vgg/data/flowers/102/README.txt
+curl.exe --fail --location --output data/flowers102/102flowers.tgz https://www.robots.ox.ac.uk/~vgg/data/flowers/102/102flowers.tgz
+.\.venv\Scripts\python.exe prepare_flower25.py
+```
+
+已下载并准备好时，直接使用现有清单，无需重复下载。`--metadata-only` 只核对来源类别。
+来源说明见 `outputs/flower25/oxford_README.txt`；原五类作者信息仍见原数据 `LICENSE.txt`。
+
+### 二十五类训练
+
+继续使用自己实现的 `FlowerResNet`，将分类层输出数设为 25，
+参数数量为 2801465。此版本从随机初始化开始，未加载第三方预训练网络。
+默认训练二十轮，采用 Adam、学习率 0.001、batch size 16、图片尺寸 128×128。
+
+新增类别通常比原五类少，训练时按类别数量的倒数进行有放回抽样，
+让每类被抽到的期望机会相同。此时一轮代表抽取与训练集大小相同的一批样本，
+不是保证每张训练图片恰好使用一次。加入随机裁剪、水平翻转和轻度颜色变化；
+验证与预测仍为 RGB、Resize 到 128×128、ToTensor，不使用随机增强。
+
+选择最佳模型的指标改为**验证集各类别召回率的平均值**，
+让每个类别在选模时具有相同权重，同时记录整体准确率。
+这与第一阶段按验证准确率选模的规则不同，两阶段成绩不能直接作公平优劣比较。
+
+先检查，再正式训练：
+
+```powershell
+.\.venv\Scripts\python.exe train_flower25.py --dry-run
+.\.venv\Scripts\python.exe train_flower25.py --epochs 20
+```
+
+模型输出形状为 `[batch_size, 25]`。`--dry-run` 只检查，不开始训练。
+正式训练保存到独立的 `outputs/train25_时间戳/`，包含配套清单、历史和最佳/最后模型。
+如需继续到更多轮次，用本版本的最后模型恢复，并显式给出希望使用的学习率：
+
+```powershell
+.\.venv\Scripts\python.exe train_flower25.py --resume "outputs/本次25类训练目录/last_model.pth" --epochs 30 --lr 0.0003
+```
+
+### 训练完成后的运行方式
+
+把以下占位目录替换为本次终端打印的真实目录：
+
+```powershell
+.\.venv\Scripts\python.exe plot_training.py "outputs/本次25类训练目录"
+.\.venv\Scripts\python.exe predict.py "图片路径" --checkpoint "outputs/本次25类训练目录/best_model.pth"
+.\.venv\Scripts\python.exe evaluate.py --checkpoint "outputs/本次25类训练目录/best_model.pth"
+```
+
+预测类别数及中文名以所选模型的元数据为准。没有指定 `--checkpoint` 时，
+`predict.py` 默认仍加载旧五类初始模型；二十五类预测必须指定已训练的新权重。
+评估自动读取训练目录内的配套清单。先根据验证集选定模型，再进行测试评估；
+测试成绩作为最终报告，不用于反复调参。
+
+当前第二阶段尚无正式训练/测试成绩。待实际运行后，再补充最佳轮次、
+验证平均类别召回率、整体准确率、测试结果与个人观察。

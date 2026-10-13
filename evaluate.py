@@ -23,13 +23,18 @@ from resnet import FlowerResNet
 PROJECT_DIR = Path(__file__).resolve().parent
 
 
-def evaluate(checkpoint_path, output_dir, device):
+def evaluate(checkpoint_path, output_dir, device, manifest_override=None):
     checkpoint = torch.load(
         checkpoint_path, map_location="cpu", weights_only=True,
     )
     classes = checkpoint["class_names"]
     image_size = int(checkpoint["image_size"])
-    manifest_path = PROJECT_DIR / "outputs" / "split_manifest.csv"
+    # 新实验随模型保存独立清单，旧五类模型仍使用原清单。
+    manifest_path = manifest_override or (
+        checkpoint_path.parent / "split_manifest.csv"
+        if (checkpoint_path.parent / "split_manifest.csv").is_file()
+        else PROJECT_DIR / "outputs" / "split_manifest.csv"
+    )
     split_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
     if checkpoint.get("split_sha256", split_hash) != split_hash:
         raise ValueError("数据划分清单与训练时不同，请恢复原清单")
@@ -49,7 +54,7 @@ def evaluate(checkpoint_path, output_dir, device):
         transforms.Resize((image_size, image_size)),
         transforms.ToTensor(),
     ])
-    dataset = FlowerDataset("test", transform)
+    dataset = FlowerDataset("test", transform, manifest_path=manifest_path)
     if len(dataset) == 0:
         raise ValueError("测试集为空")
     loader = DataLoader(dataset, batch_size=16, shuffle=False, num_workers=0)
@@ -102,6 +107,8 @@ def evaluate(checkpoint_path, output_dir, device):
         "correct_count": correct,
         "test_accuracy": accuracy,
         "test_loss": total_loss / len(dataset),
+        "test_macro_recall": float(per_class["recall"].mean()),
+        "selection_metric": checkpoint.get("selection_metric", "val_accuracy"),
         "class_names": classes,
         "confusion_matrix": confusion.tolist(),
         "matrix_axes": "rows=true, columns=predicted",
@@ -117,7 +124,8 @@ def evaluate(checkpoint_path, output_dir, device):
         output_dir / "confusion_matrix.csv", index_label="true_class",
     )
 
-    fig, ax = plt.subplots(figsize=(7, 6))
+    side = max(7, len(classes) * 0.46 + 2)
+    fig, ax = plt.subplots(figsize=(side, side - 1))
     chart = ax.imshow(confusion, cmap="Blues", vmin=0)
     fig.colorbar(chart, ax=ax, label="Number of images")
     ax.set_xticks(range(len(classes)), classes, rotation=30, ha="right")
@@ -128,13 +136,15 @@ def evaluate(checkpoint_path, output_dir, device):
     for row in range(len(classes)):
         for col in range(len(classes)):
             ax.text(col, row, str(confusion[row, col]), ha="center", va="center",
-                    color="white" if confusion[row, col] > confusion.max() / 2 else "black")
+                    color="white" if confusion[row, col] > confusion.max() / 2 else "black",
+                    fontsize=8 if len(classes) > 10 else 11)
     fig.tight_layout()
     fig.savefig(output_dir / "confusion_matrix.png", dpi=150)
     plt.close(fig)
 
     print(f"测试损失：{summary['test_loss']:.4f}")
     print(f"测试准确率：{accuracy:.1%}（{correct}/{len(dataset)}）")
+    print(f"各类别召回率的平均值：{summary['test_macro_recall']:.1%}")
     print("各类别的召回率（该类别测试图片中预测正确的比例）：")
     for name, count, class_correct, recall in per_class.itertuples(index=False, name=None):
         print(f"  {name}：{class_correct}/{count}，{recall:.1%}")
@@ -145,6 +155,7 @@ def main():
     parser = argparse.ArgumentParser(description="评估固定测试集上的分类表现")
     parser.add_argument("--checkpoint", required=True, type=Path)
     parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--manifest", type=Path, help="覆盖模型配套的分组清单")
     parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto")
     args = parser.parse_args()
     checkpoint_path = args.checkpoint.expanduser().resolve()
@@ -157,7 +168,8 @@ def main():
         parser.error("CUDA 不可用，可用 --device cpu")
     output_dir = (args.output_dir or checkpoint_path.parent / "evaluation").resolve()
     try:
-        evaluate(checkpoint_path, output_dir, torch.device(device_name))
+        evaluate(checkpoint_path, output_dir, torch.device(device_name),
+                 args.manifest.resolve() if args.manifest else None)
     except (OSError, ValueError, KeyError, RuntimeError) as error:
         parser.exit(2, f"评估失败：{error}\n")
 

@@ -1,0 +1,6 @@
+path,class,kept_path,reason
+data/flower_photos/sunflowers/14889392928_9742aed45b_m.jpg,sunflowers,data/flower_photos/sunflowers/15066430311_fb57fa92b0_m.jpg,same_pixels_same_label
+data/flower_photos/tulips/15922772266_1167a06620.jpg,tulips,,conflicting_labels_excluded
+data/flower_photos/roses/15922772266_1167a06620.jpg,roses,,conflicting_labels_excluded
+data/flower_photos/sunflowers/15072973261_73e2912ef2_n.jpg,sunflowers,data/flower_photos/sunflowers/15069459615_7e0fd61914_n.jpg,same_pixels_same_label
+data/flowers102/selected_images/carnations/oxford_image_08077.jpg,carnations,data/flowers102/selected_images/carnations/oxford_image_08067.jpg,same_pixels_same_label
