@@ -15,6 +15,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import transforms
+from torchvision.models import resnet18
 
 from flower_dataset import FlowerDataset
 from resnet import FlowerResNet
@@ -49,17 +50,31 @@ def evaluate(checkpoint_path, output_dir, device, manifest_override=None):
     ) != expected:
         raise ValueError("清单的类别编号与模型不一致")
 
-    # 测试处理与验证一致，不使用随机翻转。
-    transform = transforms.Compose([
-        transforms.Resize((image_size, image_size)),
-        transforms.ToTensor(),
-    ])
+    # 测试时使用模型在验证阶段采用的相同预处理。
+    architecture = checkpoint.get("architecture", "handwritten_flower_resnet")
+    if architecture == "torchvision_resnet18_pretrained_head":
+        transform = transforms.Compose([
+            transforms.Resize(256), transforms.CenterCrop(image_size),
+            transforms.ToTensor(),
+            transforms.Normalize(checkpoint["normalization_mean"],
+                                 checkpoint["normalization_std"]),
+        ])
+        model = resnet18(weights=None)
+        model.fc = nn.Linear(model.fc.in_features, len(classes))
+    elif architecture == "handwritten_flower_resnet":
+        transform = transforms.Compose([
+            transforms.Resize((image_size, image_size)),
+            transforms.ToTensor(),
+        ])
+        model = FlowerResNet(num_classes=len(classes))
+    else:
+        raise ValueError(f"未知模型结构：{architecture}")
     dataset = FlowerDataset("test", transform, manifest_path=manifest_path)
     if len(dataset) == 0:
         raise ValueError("测试集为空")
     loader = DataLoader(dataset, batch_size=16, shuffle=False, num_workers=0)
 
-    model = FlowerResNet(num_classes=len(classes)).to(device)
+    model = model.to(device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()  # BatchNorm 使用保存的统计量。
     criterion = nn.CrossEntropyLoss(reduction="sum")
@@ -101,6 +116,7 @@ def evaluate(checkpoint_path, output_dir, device, manifest_override=None):
     summary = {
         "checkpoint_path": str(checkpoint_path),
         "checkpoint_epoch": int(checkpoint["epoch"]),
+        "architecture": architecture,
         "best_val_accuracy": float(checkpoint["best_val_accuracy"]),
         "split_sha256": split_hash,
         "test_count": len(dataset),

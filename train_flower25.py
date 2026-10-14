@@ -48,7 +48,8 @@ def run_epoch(model, loader, criterion, device, num_classes, optimizer=None):
     if total == 0 or (not training and (counts == 0).any()):
         raise ValueError("数据集为空或验证集缺少某个类别")
     recall = correct_counts.float() / counts.clamp(min=1)
-    return loss_sum / total, correct_counts.sum().item() / total, recall.mean().item()
+    return (loss_sum / total, correct_counts.sum().item() / total,
+            recall.mean().item(), recall.tolist())
 
 
 def main():
@@ -56,11 +57,16 @@ def main():
     parser.add_argument("--data-info", type=Path, default=ROOT / "outputs" / "flower25" / "dataset_info.json")
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--lr", type=float, default=0.001)
+    parser.add_argument("--sampler-power", type=float, default=1.0,
+                        help="按类别数量倒数的指数抽样；1 为初版等类抽样，0.5 为较温和的抽样")
+    parser.add_argument("--samples-per-epoch", type=int,
+                        help="每轮抽取的训练图片次数；清洗对照可设为原始训练集的次数")
     parser.add_argument("--resume", type=Path, help="从本版本的 last_model.pth 接续")
     parser.add_argument("--dry-run", action="store_true", help="只检查数据和前向计算，不开始训练")
     args = parser.parse_args()
-    if args.epochs < 1 or args.lr <= 0:
-        parser.error("轮次和学习率必须大于零")
+    if (args.epochs < 1 or args.lr <= 0 or not 0 <= args.sampler_power <= 1
+            or (args.samples_per_epoch is not None and args.samples_per_epoch < 1)):
+        parser.error("轮次、学习率必须大于零；抽样指数须在 0～1 之间")
     info_path = args.data_info.resolve()
     info = json.loads(info_path.read_text(encoding="utf-8"))
     manifest_path = info_path.parent / "split_manifest.csv"
@@ -94,9 +100,14 @@ def main():
     counts = train_dataset.rows["label"].value_counts().reindex(range(25), fill_value=0)
     if (counts == 0).any():
         parser.error("训练集缺少某个类别")
-    # 每类被抽到的总机会相同；仅训练集重复抽样，验证集仍逐张检查。
-    weights = train_dataset.rows["label"].map(lambda label: 1.0 / counts[label]).tolist()
-    sampler = WeightedRandomSampler(weights, num_samples=len(train_dataset), replacement=True)
+    # 指数 1 为初版等类抽样；0.5 减少稀有类重复而仍照顾较少类别。
+    # 只改变训练集抽样，不改变任何标签、验证集或测试集。
+    weights = train_dataset.rows["label"].map(
+        lambda label: float(counts[label]) ** (-args.sampler_power)
+    ).tolist()
+    samples_per_epoch = args.samples_per_epoch or len(train_dataset)
+    sampler = WeightedRandomSampler(weights, num_samples=samples_per_epoch,
+                                    replacement=True)
     train_loader = DataLoader(train_dataset, batch_size=16, sampler=sampler, num_workers=0)
     val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False, num_workers=0)
     model = FlowerResNet(num_classes=25).to(device)
@@ -110,6 +121,10 @@ def main():
             parser.error("恢复模型的类别或数据划分不匹配")
         if checkpoint.get("selection_metric") != "val_macro_recall":
             parser.error("请使用二十五类版本的检查点")
+        if float(checkpoint.get("sampler_power", 1.0)) != args.sampler_power:
+            parser.error("接续训练的抽样指数须与检查点一致；更换抽样方式请开始独立训练")
+        if int(checkpoint.get("samples_per_epoch", len(train_dataset))) != samples_per_epoch:
+            parser.error("接续训练的每轮抽样次数须与检查点一致")
         model.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         for group in optimizer.param_groups:
@@ -126,6 +141,8 @@ def main():
     print("运行设备：", device)
     print(f"类别数量：25；训练图片：{len(train_dataset)}；验证图片：{len(val_dataset)}")
     print("选模依据：验证集各类别召回率的平均值，每一类权重相同。")
+    print(f"训练抽样指数：{args.sampler_power:g}（原版为 1，温和抽样为 0.5）")
+    print(f"每轮抽样次数：{samples_per_epoch}")
     print("模型参数数量：", sum(p.numel() for p in model.parameters()))
     if args.dry_run:
         images, labels = next(iter(val_loader))
@@ -149,14 +166,18 @@ def main():
     criterion = nn.CrossEntropyLoss()
     for epoch in range(start_epoch, args.epochs + 1):
         print(f"\n开始第 {epoch}/{args.epochs} 轮", flush=True)
-        train_loss, train_accuracy, _ = run_epoch(model, train_loader, criterion, device, 25, optimizer)
-        val_loss, val_accuracy, val_macro = run_epoch(model, val_loader, criterion, device, 25)
+        train_loss, train_accuracy, _, _ = run_epoch(model, train_loader, criterion, device, 25, optimizer)
+        val_loss, val_accuracy, val_macro, val_recalls = run_epoch(model, val_loader, criterion, device, 25)
+        roses_recall = val_recalls[classes.index("roses")]
+        carnations_recall = val_recalls[classes.index("carnations")]
         print(f"训练损失：{train_loss:.4f}，训练抽样准确率：{train_accuracy:.1%}\n"
               f"验证损失：{val_loss:.4f}，验证准确率：{val_accuracy:.1%}\n"
-              f"验证平均类别召回率：{val_macro:.1%}", flush=True)
+              f"验证平均类别召回率：{val_macro:.1%}\n"
+              f"玫瑰召回率：{roses_recall:.1%}；康乃馨召回率：{carnations_recall:.1%}", flush=True)
         history.append({
             "epoch": epoch, "train_loss": train_loss, "train_accuracy": train_accuracy,
             "val_loss": val_loss, "val_accuracy": val_accuracy, "val_macro_recall": val_macro,
+            "val_roses_recall": roses_recall, "val_carnations_recall": carnations_recall,
         })
         improved = val_macro > best_macro
         if improved:
@@ -168,6 +189,8 @@ def main():
             "selection_metric": "val_macro_recall", "best_val_macro_recall": best_macro,
             "best_val_accuracy": selected_accuracy, "history": list(history),
             "training_sampler": "inverse_class_count_with_replacement",
+            "sampler_power": args.sampler_power,
+            "samples_per_epoch": samples_per_epoch,
             "initialization": "random" if not args.resume else str(args.resume.resolve()),
         }
         torch.save(state, run_dir / "last_model.pth")

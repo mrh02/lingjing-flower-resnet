@@ -1,0 +1,13 @@
+{
+  "checkpoint": "D:\\Codex.data\\lingjing\\outputs\\train25_20261014_164649_042406\\best_model.pth",
+  "epoch": 19,
+  "split": "val",
+  "split_sha256": "c81e57256e0d7bd21485fe3b72e23bde0c613d54f159b8a790d1c105f26e5569",
+  "count": 882,
+  "accuracy": 0.6122448979591837,
+  "macro_recall": 0.6115266453630995,
+  "roses_to_carnations": 16,
+  "carnations_to_roses": 0,
+  "roses_recall": 0.25,
+  "carnations_recall": 0.7142857142857143
+}

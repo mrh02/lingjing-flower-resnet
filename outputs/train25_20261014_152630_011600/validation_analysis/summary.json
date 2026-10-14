@@ -1,0 +1,14 @@
+{
+  "checkpoint": "D:\\Codex.data\\lingjing\\outputs\\train25_20261014_152630_011600\\best_model.pth",
+  "epoch": 20,
+  "architecture": "handwritten_flower_resnet",
+  "split": "val",
+  "split_sha256": "f1a0fa0570cc5475f79459acf4229966b06ab73615ef62cc173a55ff97fe29ea",
+  "count": 882,
+  "accuracy": 0.6655328798185941,
+  "macro_recall": 0.6896927692305951,
+  "roses_to_carnations": 6,
+  "carnations_to_roses": 0,
+  "roses_recall": 0.34375,
+  "carnations_recall": 0.5714285714285714
+}

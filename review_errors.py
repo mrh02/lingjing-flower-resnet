@@ -1,4 +1,4 @@
-"""从已有测试预测清单中选取错分样例，不再次运行模型。"""
+"""从已有预测清单中选取错分样例，不再次运行模型。"""
 
 import argparse
 from pathlib import Path
@@ -14,8 +14,8 @@ from PIL import Image
 PROJECT_DIR = Path(__file__).resolve().parent
 
 
-def review_errors(results_dir):
-    predictions = pd.read_csv(results_dir / "test_predictions.csv")
+def review_errors(results_dir, predictions_filename="test_predictions.csv"):
+    predictions = pd.read_csv(results_dir / predictions_filename)
     # 保留真实类别与预测类别不同的图片。
     errors = predictions[
         predictions["true_class"] != predictions["predicted_class"]
@@ -72,7 +72,7 @@ def review_errors(results_dir):
 
     print("总错分图片数：", len(errors))
     print("选择规则：数量最多的三种错误，每种取清单中的前两张。")
-    print("样例用于解释错误，不代表全部测试图片的分布。")
+    print("样例用于解释错误，不代表该组全部图片的分布。")
     for pair in pairs.itertuples(index=False):
         print(f"  {pair.true_class} → {pair.predicted_class}：{pair.error_count} 张")
     print("错分图片对照图：", chart_path)
@@ -80,11 +80,13 @@ def review_errors(results_dir):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="查看已有测试结果中的错分图片")
-    parser.add_argument("results_dir", type=Path, help="包含 test_predictions.csv 的目录")
+    parser = argparse.ArgumentParser(description="查看已有预测结果中的错分图片")
+    parser.add_argument("results_dir", type=Path, help="包含预测清单的目录")
+    parser.add_argument("--predictions-file", default="test_predictions.csv",
+                        help="目录中的预测清单文件名；默认 test_predictions.csv")
     args = parser.parse_args()
     try:
-        review_errors(args.results_dir.expanduser().resolve())
+        review_errors(args.results_dir.expanduser().resolve(), args.predictions_file)
     except (OSError, KeyError, ValueError) as error:
         parser.exit(2, f"生成失败：{error}\n")
 

@@ -11,3 +11,6 @@ data/
 # 临时文件
 tmp/
 .ipynb_checkpoints/
+
+# 标签审查的缩略图可在本地重建，避免把整批来源图片传到仓库
+outputs/flower25/label_audit/*.png

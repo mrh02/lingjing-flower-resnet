@@ -1,0 +1,34 @@
+{
+  "checked_images": 1589,
+  "issue_count": 0,
+  "counts_by_split": {
+    "roses": {
+      "train": 447,
+      "val": 96,
+      "test": 97
+    },
+    "dandelion": {
+      "train": 628,
+      "val": 134,
+      "test": 136
+    },
+    "carnations": {
+      "train": 35,
+      "val": 7,
+      "test": 9
+    }
+  },
+  "counts_by_source": {
+    "roses": {
+      "tensorflow_flower_photos": 640
+    },
+    "dandelion": {
+      "tensorflow_flower_photos": 898
+    },
+    "carnations": {
+      "oxford_flowers102": 51
+    }
+  },
+  "candidate_val_roses_predicted_dandelion": 18,
+  "visual_review": "All 447 train roses have contact pages; 36 random train dandelions, all 35 train carnations, and all 18 validation roses predicted dandelion are shown. Manual review candidates are listed separately; contact sheets cannot prove every label correct."
+}

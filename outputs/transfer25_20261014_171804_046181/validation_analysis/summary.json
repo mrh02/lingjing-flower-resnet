@@ -1,0 +1,14 @@
+{
+  "checkpoint": "D:\\Codex.data\\lingjing\\outputs\\transfer25_20261014_171804_046181\\best_model.pth",
+  "epoch": 6,
+  "architecture": "torchvision_resnet18_pretrained_head",
+  "split": "val",
+  "split_sha256": "f1a0fa0570cc5475f79459acf4229966b06ab73615ef62cc173a55ff97fe29ea",
+  "count": 882,
+  "accuracy": 0.8741496598639455,
+  "macro_recall": 0.9144164553184132,
+  "roses_to_carnations": 0,
+  "carnations_to_roses": 0,
+  "roses_recall": 0.7395833333333334,
+  "carnations_recall": 1.0
+}
