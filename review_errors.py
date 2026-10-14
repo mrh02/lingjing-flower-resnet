@@ -62,7 +62,9 @@ def review_errors(results_dir):
              "First two images per error type in CSV order; examples are not a random sample.\n"
              "Softmax scores do not measure accuracy.",
              ha="center", fontsize=9)
-    fig.tight_layout(rect=(0, 0.055, 1, 0.955))
+    # 图片宽高比不同，预留行间距，避免两行标题盖住上一行图片。
+    fig.subplots_adjust(left=0.02, right=0.98, bottom=0.075, top=0.90,
+                        hspace=0.35, wspace=0.06)
     chart_path = results_dir / "error_examples.png"
     fig.savefig(chart_path, dpi=150)
     plt.close(fig)

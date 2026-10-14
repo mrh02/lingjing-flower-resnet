@@ -1,0 +1,7 @@
+path,true_class,label,predicted_class,correct,softmax_score,pair_error_count
+data/flower_photos/roses/15699509054_d3e125286f_n.jpg,roses,2,carnations,False,0.7940685749053955,31
+data/flower_photos/roses/9164900485_605aa12da8.jpg,roses,2,carnations,False,0.9888349175453186,31
+data/flower_photos/dandelion/14292205986_da230467ef.jpg,dandelion,1,sunflowers,False,0.7726378440856934,30
+data/flower_photos/dandelion/7164500544_332b75aa3b.jpg,dandelion,1,sunflowers,False,0.971105694770813,30
+data/flower_photos/tulips/13903937027_44b9f2f5b8.jpg,tulips,4,sunflowers,False,0.8468334674835205,24
+data/flower_photos/tulips/13197345653_0f685b3c97_n.jpg,tulips,4,sunflowers,False,0.7097543478012085,24
