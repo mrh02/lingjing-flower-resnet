@@ -62,8 +62,12 @@ def main():
     parser.add_argument("--samples-per-epoch", type=int,
                         help="每轮抽取的训练图片次数；清洗对照可设为原始训练集的次数")
     parser.add_argument("--resume", type=Path, help="从本版本的 last_model.pth 接续")
+    parser.add_argument("--init-from", type=Path,
+                        help="用指定的手写模型权重开始独立实验，并重新建立优化器")
     parser.add_argument("--dry-run", action="store_true", help="只检查数据和前向计算，不开始训练")
     args = parser.parse_args()
+    if args.resume and args.init_from:
+        parser.error("--resume 与 --init-from 不能同时使用")
     if (args.epochs < 1 or args.lr <= 0 or not 0 <= args.sampler_power <= 1
             or (args.samples_per_epoch is not None and args.samples_per_epoch < 1)):
         parser.error("轮次、学习率必须大于零；抽样指数须在 0～1 之间")
@@ -114,6 +118,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.0001)
     start_epoch, best_macro, selected_accuracy, history = 1, -1.0, 0.0, []
     previous_best = None
+    initialization = "random"
     if args.resume:
         checkpoint_path = args.resume.resolve()
         checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
@@ -136,6 +141,19 @@ def main():
         if best["epoch"] >= start_epoch:
             parser.error("配套最佳模型来自更晚轮次，请从最后一轮模型恢复")
         best_macro, selected_accuracy = best["best_val_macro_recall"], best["best_val_accuracy"]
+        initialization = str(checkpoint_path)
+    elif args.init_from:
+        checkpoint_path = args.init_from.resolve()
+        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
+        if checkpoint.get("class_names") != classes:
+            parser.error("初始化模型的类别顺序不匹配")
+        if checkpoint.get("selection_metric") != "val_macro_recall":
+            parser.error("初始化模型应为 25 类手写 ResNet 检查点")
+        compatible_splits = {digest, info.get("base_split_sha256")}
+        if checkpoint.get("split_sha256") not in compatible_splits:
+            parser.error("初始化模型与训练清单不匹配")
+        model.load_state_dict(checkpoint["model_state_dict"])
+        initialization = str(checkpoint_path)
     if args.epochs < start_epoch:
         parser.error("目标总轮次必须大于已完成轮次")
     print("运行设备：", device)
@@ -191,7 +209,7 @@ def main():
             "training_sampler": "inverse_class_count_with_replacement",
             "sampler_power": args.sampler_power,
             "samples_per_epoch": samples_per_epoch,
-            "initialization": "random" if not args.resume else str(args.resume.resolve()),
+            "initialization": initialization,
         }
         torch.save(state, run_dir / "last_model.pth")
         if improved:

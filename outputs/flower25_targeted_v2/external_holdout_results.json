@@ -1,0 +1,82 @@
+[
+  {
+    "checkpoint": "D:\\Codex.data\\lingjing\\outputs\\train25_20261020_202918_705835\\best_model.pth",
+    "epoch": 33,
+    "holdout_sha256": "f0aabaa51d429a00b9c584429d818c767601531fcfb1ca1187761fd50f9d6a09",
+    "correct": 14,
+    "total": 31,
+    "accuracy": 0.45161290322580644,
+    "per_class": {
+      "carnations": {
+        "correct": 2,
+        "total": 13,
+        "recall": 0.15384615384615385
+      },
+      "roses": {
+        "correct": 12,
+        "total": 18,
+        "recall": 0.6666666666666666
+      }
+    }
+  },
+  {
+    "checkpoint": "D:\\Codex.data\\lingjing\\outputs\\train25_20261021_111258_686250\\best_model.pth",
+    "epoch": 3,
+    "holdout_sha256": "f0aabaa51d429a00b9c584429d818c767601531fcfb1ca1187761fd50f9d6a09",
+    "correct": 14,
+    "total": 31,
+    "accuracy": 0.45161290322580644,
+    "per_class": {
+      "carnations": {
+        "correct": 2,
+        "total": 13,
+        "recall": 0.15384615384615385
+      },
+      "roses": {
+        "correct": 12,
+        "total": 18,
+        "recall": 0.6666666666666666
+      }
+    }
+  },
+  {
+    "checkpoint": "D:\\Codex.data\\lingjing\\outputs\\train25_20261021_105243_077163\\best_model.pth",
+    "epoch": 3,
+    "holdout_sha256": "f0aabaa51d429a00b9c584429d818c767601531fcfb1ca1187761fd50f9d6a09",
+    "correct": 12,
+    "total": 31,
+    "accuracy": 0.3870967741935484,
+    "per_class": {
+      "carnations": {
+        "correct": 3,
+        "total": 13,
+        "recall": 0.23076923076923078
+      },
+      "roses": {
+        "correct": 9,
+        "total": 18,
+        "recall": 0.5
+      }
+    }
+  },
+  {
+    "checkpoint": "D:\\Codex.data\\lingjing\\outputs\\train25_20261021_115002_596267\\best_model.pth",
+    "epoch": 1,
+    "holdout_sha256": "f0aabaa51d429a00b9c584429d818c767601531fcfb1ca1187761fd50f9d6a09",
+    "correct": 15,
+    "total": 31,
+    "accuracy": 0.4838709677419355,
+    "per_class": {
+      "carnations": {
+        "correct": 5,
+        "total": 13,
+        "recall": 0.38461538461538464
+      },
+      "roses": {
+        "correct": 10,
+        "total": 18,
+        "recall": 0.5555555555555556
+      }
+    }
+  }
+]

@@ -1,0 +1,221 @@
+{
+  "class_names": [
+    "daisy",
+    "dandelion",
+    "roses",
+    "sunflowers",
+    "tulips",
+    "lilies",
+    "lotus",
+    "orchids",
+    "camellias",
+    "hibiscus",
+    "carnations",
+    "daffodils",
+    "irises",
+    "california_poppies",
+    "petunias",
+    "bougainvillea",
+    "magnolias",
+    "marigolds",
+    "water_lilies",
+    "bird_of_paradise",
+    "frangipani",
+    "anthuriums",
+    "azaleas",
+    "cyclamens",
+    "snapdragons"
+  ],
+  "class_names_zh": {
+    "daisy": "雏菊",
+    "dandelion": "蒲公英",
+    "roses": "玫瑰",
+    "sunflowers": "向日葵",
+    "tulips": "郁金香",
+    "lilies": "百合（卷丹百合）",
+    "lotus": "荷花",
+    "orchids": "兰花（选取三类）",
+    "camellias": "山茶花",
+    "hibiscus": "木槿属花卉",
+    "carnations": "康乃馨",
+    "daffodils": "黄水仙",
+    "irises": "鸢尾（选取两类）",
+    "california_poppies": "花菱草",
+    "petunias": "矮牵牛",
+    "bougainvillea": "三角梅",
+    "magnolias": "木兰属花卉",
+    "marigolds": "万寿菊",
+    "water_lilies": "睡莲",
+    "bird_of_paradise": "鹤望兰",
+    "frangipani": "鸡蛋花",
+    "anthuriums": "红掌",
+    "azaleas": "杜鹃花",
+    "cyclamens": "仙客来",
+    "snapdragons": "金鱼草"
+  },
+  "oxford_source": "https://www.robots.ox.ac.uk/~vgg/data/flowers/102/",
+  "oxford_category_mapping": [
+    {
+      "class": "lilies",
+      "name_zh": "百合（卷丹百合）",
+      "source_categories": {
+        "tiger lily": 6
+      }
+    },
+    {
+      "class": "lotus",
+      "name_zh": "荷花",
+      "source_categories": {
+        "lotus": 78
+      }
+    },
+    {
+      "class": "orchids",
+      "name_zh": "兰花（选取三类）",
+      "source_categories": {
+        "moon orchid": 7,
+        "hard-leaved pocket orchid": 2,
+        "ruby-lipped cattleya": 36
+      }
+    },
+    {
+      "class": "camellias",
+      "name_zh": "山茶花",
+      "source_categories": {
+        "camellia": 96
+      }
+    },
+    {
+      "class": "hibiscus",
+      "name_zh": "木槿属花卉",
+      "source_categories": {
+        "hibiscus": 83
+      }
+    },
+    {
+      "class": "carnations",
+      "name_zh": "康乃馨",
+      "source_categories": {
+        "carnation": 31
+      }
+    },
+    {
+      "class": "daffodils",
+      "name_zh": "黄水仙",
+      "source_categories": {
+        "daffodil": 42
+      }
+    },
+    {
+      "class": "irises",
+      "name_zh": "鸢尾（选取两类）",
+      "source_categories": {
+        "bearded iris": 68,
+        "yellow iris": 15
+      }
+    },
+    {
+      "class": "california_poppies",
+      "name_zh": "花菱草",
+      "source_categories": {
+        "californian poppy": 65
+      }
+    },
+    {
+      "class": "petunias",
+      "name_zh": "矮牵牛",
+      "source_categories": {
+        "petunia": 51
+      }
+    },
+    {
+      "class": "bougainvillea",
+      "name_zh": "三角梅",
+      "source_categories": {
+        "bougainvillea": 95
+      }
+    },
+    {
+      "class": "magnolias",
+      "name_zh": "木兰属花卉",
+      "source_categories": {
+        "magnolia": 87
+      }
+    },
+    {
+      "class": "marigolds",
+      "name_zh": "万寿菊",
+      "source_categories": {
+        "marigold": 47
+      }
+    },
+    {
+      "class": "water_lilies",
+      "name_zh": "睡莲",
+      "source_categories": {
+        "water lily": 73
+      }
+    },
+    {
+      "class": "bird_of_paradise",
+      "name_zh": "鹤望兰",
+      "source_categories": {
+        "bird of paradise": 8
+      }
+    },
+    {
+      "class": "frangipani",
+      "name_zh": "鸡蛋花",
+      "source_categories": {
+        "frangipani": 81
+      }
+    },
+    {
+      "class": "anthuriums",
+      "name_zh": "红掌",
+      "source_categories": {
+        "anthurium": 80
+      }
+    },
+    {
+      "class": "azaleas",
+      "name_zh": "杜鹃花",
+      "source_categories": {
+        "azalea": 72
+      }
+    },
+    {
+      "class": "cyclamens",
+      "name_zh": "仙客来",
+      "source_categories": {
+        "cyclamen": 88
+      }
+    },
+    {
+      "class": "snapdragons",
+      "name_zh": "金鱼草",
+      "source_categories": {
+        "snapdragon": 11
+      }
+    }
+  ],
+  "oxford_labels_sha256": "4903e94206bac23bf772aadf06451916df56b58fc483a62db32a97b82656651d",
+  "original_manifest_sha256": "ca2a2b5412be6fd5cc1827510dbd9ff926e8ab85192300065e1df2914e924797",
+  "split_sha256": "a7df4b7342ef7511d8dd3d605cd7678d935d41ea55ad6365af4aa8c46279dd70",
+  "split_policy": "Original 25-class train/val/test rows unchanged; vetted Commons carnations appended to train only.",
+  "deduplication": "Same RGB pixels and dimensions; does not detect all near-duplicates.",
+  "original_test_status": "Original five-class test results and example images have already been inspected; combined test is not a completely unseen final benchmark.",
+  "images": 6019,
+  "exact_duplicates_removed": 5,
+  "conflicting_label_groups_excluded": 1,
+  "conflicting_label_images_excluded": 2,
+  "original_cross_split_duplicate_groups": 2,
+  "base_split_sha256": "f1a0fa0570cc5475f79459acf4229966b06ab73615ef62cc173a55ff97fe29ea",
+  "added_carnation_train_images": 56,
+  "carnation_train_images": 91,
+  "carnation_val_images": 7,
+  "carnation_test_images": 9,
+  "commons_source_category": "https://commons.wikimedia.org/wiki/Category:Dianthus_caryophyllus",
+  "commons_selection": "Manually reviewed photos with per-file attribution in carnation_extra_sources.csv; Commons thumbnails around 500px for 128px training inputs.",
+  "near_duplicate_policy": "64-bit difference hash <=4 excluded pending review; visual similarity audit is imperfect."
+}
